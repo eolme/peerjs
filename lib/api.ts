@@ -1,4 +1,3 @@
-import { util } from "./util";
 import logger from "./logger";
 
 export class API {
@@ -39,8 +38,7 @@ export class API {
       let pathError = "";
 
       if (
-        this._options.path === "/" &&
-        this._options.host !== util.CLOUD_HOST
+        this._options.path === "/"
       ) {
         pathError =
           " If you passed in a `path` to your self-hosted PeerServer, " +
@@ -63,15 +61,10 @@ export class API {
         if (response.status === 401) {
           let helpfulError = "";
 
-          if (this._options.host === util.CLOUD_HOST) {
-            helpfulError =
-              "It looks like you're using the cloud server. You can email " +
-              "team@peerjs.com to enable peer listing for your API key.";
-          } else {
-            helpfulError =
-              "You need to enable `allow_discovery` on your self-hosted " +
-              "PeerServer to use this feature.";
-          }
+
+          helpfulError =
+            "You need to enable `allow_discovery` on your self-hosted " +
+            "PeerServer to use this feature.";
 
           throw new Error("It doesn't look like you have permission to list peers IDs. " +
             helpfulError);

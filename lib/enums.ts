@@ -1,6 +1,5 @@
 export enum ConnectionEventType {
   Open = "open",
-  Stream = "stream",
   Data = "data",
   Close = "close",
   Error = "error",
@@ -8,15 +7,13 @@ export enum ConnectionEventType {
 }
 
 export enum ConnectionType {
-  Data = "data",
-  Media = "media"
+  Data = "data"
 }
 
 export enum PeerEventType {
   Open = "open",
   Close = "close",
   Connection = "connection",
-  Call = "call",
   Disconnected = "disconnected",
   Error = "error"
 }
@@ -37,8 +34,6 @@ export enum PeerErrorType {
 }
 
 export enum SerializationType {
-  Binary = "binary",
-  BinaryUTF8 = "binary-utf8",
   JSON = "json"
 }
 
@@ -60,5 +55,4 @@ export enum ServerMessageType {
   InvalidKey = "INVALID-KEY", // The given API key cannot be found.
   Leave = "LEAVE", // Another peer has closed its connection to this peer.
   Expire = "EXPIRE" // The offer sent to a peer has expired without response.
-
 }

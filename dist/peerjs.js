@@ -9,626 +9,6 @@ function $parcel$interopDefault(a) {
 
 // ASSET: exports.ts
 var $iTK6$exports = {};
-// ASSET: ..\node_modules\peerjs-js-binarypack\lib\bufferbuilder.js
-var $EgBh$exports = {};
-var $EgBh$var$binaryFeatures = {};
-
-$EgBh$var$binaryFeatures.useBlobBuilder = function () {
-  try {
-    new Blob([]);
-    return false;
-  } catch (e) {
-    return true;
-  }
-}();
-
-$EgBh$var$binaryFeatures.useArrayBufferView = !$EgBh$var$binaryFeatures.useBlobBuilder && function () {
-  try {
-    return new Blob([new Uint8Array([])]).size === 0;
-  } catch (e) {
-    return true;
-  }
-}();
-
-$EgBh$exports.binaryFeatures = $EgBh$var$binaryFeatures;
-var $EgBh$var$BlobBuilder = $EgBh$exports.BlobBuilder;
-
-if (typeof window !== 'undefined') {
-  $EgBh$var$BlobBuilder = $EgBh$exports.BlobBuilder = window.WebKitBlobBuilder || window.MozBlobBuilder || window.MSBlobBuilder || window.BlobBuilder;
-}
-
-function $EgBh$var$BufferBuilder() {
-  this._pieces = [];
-  this._parts = [];
-}
-
-$EgBh$var$BufferBuilder.prototype.append = function (data) {
-  if (typeof data === 'number') {
-    this._pieces.push(data);
-  } else {
-    this.flush();
-
-    this._parts.push(data);
-  }
-};
-
-$EgBh$var$BufferBuilder.prototype.flush = function () {
-  if (this._pieces.length > 0) {
-    var buf = new Uint8Array(this._pieces);
-
-    if (!$EgBh$var$binaryFeatures.useArrayBufferView) {
-      buf = buf.buffer;
-    }
-
-    this._parts.push(buf);
-
-    this._pieces = [];
-  }
-};
-
-$EgBh$var$BufferBuilder.prototype.getBuffer = function () {
-  this.flush();
-
-  if ($EgBh$var$binaryFeatures.useBlobBuilder) {
-    var builder = new $EgBh$var$BlobBuilder();
-
-    for (var i = 0, ii = this._parts.length; i < ii; i++) {
-      builder.append(this._parts[i]);
-    }
-
-    return builder.getBlob();
-  } else {
-    return new Blob(this._parts);
-  }
-};
-
-$EgBh$exports.BufferBuilder = $EgBh$var$BufferBuilder;
-// ASSET: ..\node_modules\peerjs-js-binarypack\lib\binarypack.js
-var $kdPp$exports = {};
-var $kdPp$var$BufferBuilder = $EgBh$exports.BufferBuilder;
-var $kdPp$var$binaryFeatures = $EgBh$exports.binaryFeatures;
-var $kdPp$var$BinaryPack = {
-  unpack: function (data) {
-    var unpacker = new $kdPp$var$Unpacker(data);
-    return unpacker.unpack();
-  },
-  pack: function (data) {
-    var packer = new $kdPp$var$Packer();
-    packer.pack(data);
-    var buffer = packer.getBuffer();
-    return buffer;
-  }
-};
-$kdPp$exports = $kdPp$var$BinaryPack;
-
-function $kdPp$var$Unpacker(data) {
-  // Data is ArrayBuffer
-  this.index = 0;
-  this.dataBuffer = data;
-  this.dataView = new Uint8Array(this.dataBuffer);
-  this.length = this.dataBuffer.byteLength;
-}
-
-$kdPp$var$Unpacker.prototype.unpack = function () {
-  var type = this.unpack_uint8();
-
-  if (type < 0x80) {
-    return type;
-  } else if ((type ^ 0xe0) < 0x20) {
-    return (type ^ 0xe0) - 0x20;
-  }
-
-  var size;
-
-  if ((size = type ^ 0xa0) <= 0x0f) {
-    return this.unpack_raw(size);
-  } else if ((size = type ^ 0xb0) <= 0x0f) {
-    return this.unpack_string(size);
-  } else if ((size = type ^ 0x90) <= 0x0f) {
-    return this.unpack_array(size);
-  } else if ((size = type ^ 0x80) <= 0x0f) {
-    return this.unpack_map(size);
-  }
-
-  switch (type) {
-    case 0xc0:
-      return null;
-
-    case 0xc1:
-      return undefined;
-
-    case 0xc2:
-      return false;
-
-    case 0xc3:
-      return true;
-
-    case 0xca:
-      return this.unpack_float();
-
-    case 0xcb:
-      return this.unpack_double();
-
-    case 0xcc:
-      return this.unpack_uint8();
-
-    case 0xcd:
-      return this.unpack_uint16();
-
-    case 0xce:
-      return this.unpack_uint32();
-
-    case 0xcf:
-      return this.unpack_uint64();
-
-    case 0xd0:
-      return this.unpack_int8();
-
-    case 0xd1:
-      return this.unpack_int16();
-
-    case 0xd2:
-      return this.unpack_int32();
-
-    case 0xd3:
-      return this.unpack_int64();
-
-    case 0xd4:
-      return undefined;
-
-    case 0xd5:
-      return undefined;
-
-    case 0xd6:
-      return undefined;
-
-    case 0xd7:
-      return undefined;
-
-    case 0xd8:
-      size = this.unpack_uint16();
-      return this.unpack_string(size);
-
-    case 0xd9:
-      size = this.unpack_uint32();
-      return this.unpack_string(size);
-
-    case 0xda:
-      size = this.unpack_uint16();
-      return this.unpack_raw(size);
-
-    case 0xdb:
-      size = this.unpack_uint32();
-      return this.unpack_raw(size);
-
-    case 0xdc:
-      size = this.unpack_uint16();
-      return this.unpack_array(size);
-
-    case 0xdd:
-      size = this.unpack_uint32();
-      return this.unpack_array(size);
-
-    case 0xde:
-      size = this.unpack_uint16();
-      return this.unpack_map(size);
-
-    case 0xdf:
-      size = this.unpack_uint32();
-      return this.unpack_map(size);
-  }
-};
-
-$kdPp$var$Unpacker.prototype.unpack_uint8 = function () {
-  var byte = this.dataView[this.index] & 0xff;
-  this.index++;
-  return byte;
-};
-
-$kdPp$var$Unpacker.prototype.unpack_uint16 = function () {
-  var bytes = this.read(2);
-  var uint16 = (bytes[0] & 0xff) * 256 + (bytes[1] & 0xff);
-  this.index += 2;
-  return uint16;
-};
-
-$kdPp$var$Unpacker.prototype.unpack_uint32 = function () {
-  var bytes = this.read(4);
-  var uint32 = ((bytes[0] * 256 + bytes[1]) * 256 + bytes[2]) * 256 + bytes[3];
-  this.index += 4;
-  return uint32;
-};
-
-$kdPp$var$Unpacker.prototype.unpack_uint64 = function () {
-  var bytes = this.read(8);
-  var uint64 = ((((((bytes[0] * 256 + bytes[1]) * 256 + bytes[2]) * 256 + bytes[3]) * 256 + bytes[4]) * 256 + bytes[5]) * 256 + bytes[6]) * 256 + bytes[7];
-  this.index += 8;
-  return uint64;
-};
-
-$kdPp$var$Unpacker.prototype.unpack_int8 = function () {
-  var uint8 = this.unpack_uint8();
-  return uint8 < 0x80 ? uint8 : uint8 - (1 << 8);
-};
-
-$kdPp$var$Unpacker.prototype.unpack_int16 = function () {
-  var uint16 = this.unpack_uint16();
-  return uint16 < 0x8000 ? uint16 : uint16 - (1 << 16);
-};
-
-$kdPp$var$Unpacker.prototype.unpack_int32 = function () {
-  var uint32 = this.unpack_uint32();
-  return uint32 < Math.pow(2, 31) ? uint32 : uint32 - Math.pow(2, 32);
-};
-
-$kdPp$var$Unpacker.prototype.unpack_int64 = function () {
-  var uint64 = this.unpack_uint64();
-  return uint64 < Math.pow(2, 63) ? uint64 : uint64 - Math.pow(2, 64);
-};
-
-$kdPp$var$Unpacker.prototype.unpack_raw = function (size) {
-  if (this.length < this.index + size) {
-    throw new Error('BinaryPackFailure: index is out of range' + ' ' + this.index + ' ' + size + ' ' + this.length);
-  }
-
-  var buf = this.dataBuffer.slice(this.index, this.index + size);
-  this.index += size; // buf = util.bufferToString(buf);
-
-  return buf;
-};
-
-$kdPp$var$Unpacker.prototype.unpack_string = function (size) {
-  var bytes = this.read(size);
-  var i = 0;
-  var str = '';
-  var c;
-  var code;
-
-  while (i < size) {
-    c = bytes[i];
-
-    if (c < 128) {
-      str += String.fromCharCode(c);
-      i++;
-    } else if ((c ^ 0xc0) < 32) {
-      code = (c ^ 0xc0) << 6 | bytes[i + 1] & 63;
-      str += String.fromCharCode(code);
-      i += 2;
-    } else {
-      code = (c & 15) << 12 | (bytes[i + 1] & 63) << 6 | bytes[i + 2] & 63;
-      str += String.fromCharCode(code);
-      i += 3;
-    }
-  }
-
-  this.index += size;
-  return str;
-};
-
-$kdPp$var$Unpacker.prototype.unpack_array = function (size) {
-  var objects = new Array(size);
-
-  for (var i = 0; i < size; i++) {
-    objects[i] = this.unpack();
-  }
-
-  return objects;
-};
-
-$kdPp$var$Unpacker.prototype.unpack_map = function (size) {
-  var map = {};
-
-  for (var i = 0; i < size; i++) {
-    var key = this.unpack();
-    var value = this.unpack();
-    map[key] = value;
-  }
-
-  return map;
-};
-
-$kdPp$var$Unpacker.prototype.unpack_float = function () {
-  var uint32 = this.unpack_uint32();
-  var sign = uint32 >> 31;
-  var exp = (uint32 >> 23 & 0xff) - 127;
-  var fraction = uint32 & 0x7fffff | 0x800000;
-  return (sign === 0 ? 1 : -1) * fraction * Math.pow(2, exp - 23);
-};
-
-$kdPp$var$Unpacker.prototype.unpack_double = function () {
-  var h32 = this.unpack_uint32();
-  var l32 = this.unpack_uint32();
-  var sign = h32 >> 31;
-  var exp = (h32 >> 20 & 0x7ff) - 1023;
-  var hfrac = h32 & 0xfffff | 0x100000;
-  var frac = hfrac * Math.pow(2, exp - 20) + l32 * Math.pow(2, exp - 52);
-  return (sign === 0 ? 1 : -1) * frac;
-};
-
-$kdPp$var$Unpacker.prototype.read = function (length) {
-  var j = this.index;
-
-  if (j + length <= this.length) {
-    return this.dataView.subarray(j, j + length);
-  } else {
-    throw new Error('BinaryPackFailure: read index out of range');
-  }
-};
-
-function $kdPp$var$Packer() {
-  this.bufferBuilder = new $kdPp$var$BufferBuilder();
-}
-
-$kdPp$var$Packer.prototype.getBuffer = function () {
-  return this.bufferBuilder.getBuffer();
-};
-
-$kdPp$var$Packer.prototype.pack = function (value) {
-  var type = typeof value;
-
-  if (type === 'string') {
-    this.pack_string(value);
-  } else if (type === 'number') {
-    if (Math.floor(value) === value) {
-      this.pack_integer(value);
-    } else {
-      this.pack_double(value);
-    }
-  } else if (type === 'boolean') {
-    if (value === true) {
-      this.bufferBuilder.append(0xc3);
-    } else if (value === false) {
-      this.bufferBuilder.append(0xc2);
-    }
-  } else if (type === 'undefined') {
-    this.bufferBuilder.append(0xc0);
-  } else if (type === 'object') {
-    if (value === null) {
-      this.bufferBuilder.append(0xc0);
-    } else {
-      var constructor = value.constructor;
-
-      if (constructor == Array) {
-        this.pack_array(value);
-      } else if (constructor == Blob || constructor == File || value instanceof Blob || value instanceof File) {
-        this.pack_bin(value);
-      } else if (constructor == ArrayBuffer) {
-        if ($kdPp$var$binaryFeatures.useArrayBufferView) {
-          this.pack_bin(new Uint8Array(value));
-        } else {
-          this.pack_bin(value);
-        }
-      } else if ('BYTES_PER_ELEMENT' in value) {
-        if ($kdPp$var$binaryFeatures.useArrayBufferView) {
-          this.pack_bin(new Uint8Array(value.buffer));
-        } else {
-          this.pack_bin(value.buffer);
-        }
-      } else if (constructor == Object || constructor.toString().startsWith('class')) {
-        this.pack_object(value);
-      } else if (constructor == Date) {
-        this.pack_string(value.toString());
-      } else if (typeof value.toBinaryPack === 'function') {
-        this.bufferBuilder.append(value.toBinaryPack());
-      } else {
-        throw new Error('Type "' + constructor.toString() + '" not yet supported');
-      }
-    }
-  } else {
-    throw new Error('Type "' + type + '" not yet supported');
-  }
-
-  this.bufferBuilder.flush();
-};
-
-$kdPp$var$Packer.prototype.pack_bin = function (blob) {
-  var length = blob.length || blob.byteLength || blob.size;
-
-  if (length <= 0x0f) {
-    this.pack_uint8(0xa0 + length);
-  } else if (length <= 0xffff) {
-    this.bufferBuilder.append(0xda);
-    this.pack_uint16(length);
-  } else if (length <= 0xffffffff) {
-    this.bufferBuilder.append(0xdb);
-    this.pack_uint32(length);
-  } else {
-    throw new Error('Invalid length');
-  }
-
-  this.bufferBuilder.append(blob);
-};
-
-$kdPp$var$Packer.prototype.pack_string = function (str) {
-  var length = $kdPp$var$utf8Length(str);
-
-  if (length <= 0x0f) {
-    this.pack_uint8(0xb0 + length);
-  } else if (length <= 0xffff) {
-    this.bufferBuilder.append(0xd8);
-    this.pack_uint16(length);
-  } else if (length <= 0xffffffff) {
-    this.bufferBuilder.append(0xd9);
-    this.pack_uint32(length);
-  } else {
-    throw new Error('Invalid length');
-  }
-
-  this.bufferBuilder.append(str);
-};
-
-$kdPp$var$Packer.prototype.pack_array = function (ary) {
-  var length = ary.length;
-
-  if (length <= 0x0f) {
-    this.pack_uint8(0x90 + length);
-  } else if (length <= 0xffff) {
-    this.bufferBuilder.append(0xdc);
-    this.pack_uint16(length);
-  } else if (length <= 0xffffffff) {
-    this.bufferBuilder.append(0xdd);
-    this.pack_uint32(length);
-  } else {
-    throw new Error('Invalid length');
-  }
-
-  for (var i = 0; i < length; i++) {
-    this.pack(ary[i]);
-  }
-};
-
-$kdPp$var$Packer.prototype.pack_integer = function (num) {
-  if (num >= -0x20 && num <= 0x7f) {
-    this.bufferBuilder.append(num & 0xff);
-  } else if (num >= 0x00 && num <= 0xff) {
-    this.bufferBuilder.append(0xcc);
-    this.pack_uint8(num);
-  } else if (num >= -0x80 && num <= 0x7f) {
-    this.bufferBuilder.append(0xd0);
-    this.pack_int8(num);
-  } else if (num >= 0x0000 && num <= 0xffff) {
-    this.bufferBuilder.append(0xcd);
-    this.pack_uint16(num);
-  } else if (num >= -0x8000 && num <= 0x7fff) {
-    this.bufferBuilder.append(0xd1);
-    this.pack_int16(num);
-  } else if (num >= 0x00000000 && num <= 0xffffffff) {
-    this.bufferBuilder.append(0xce);
-    this.pack_uint32(num);
-  } else if (num >= -0x80000000 && num <= 0x7fffffff) {
-    this.bufferBuilder.append(0xd2);
-    this.pack_int32(num);
-  } else if (num >= -0x8000000000000000 && num <= 0x7FFFFFFFFFFFFFFF) {
-    this.bufferBuilder.append(0xd3);
-    this.pack_int64(num);
-  } else if (num >= 0x0000000000000000 && num <= 0xFFFFFFFFFFFFFFFF) {
-    this.bufferBuilder.append(0xcf);
-    this.pack_uint64(num);
-  } else {
-    throw new Error('Invalid integer');
-  }
-};
-
-$kdPp$var$Packer.prototype.pack_double = function (num) {
-  var sign = 0;
-
-  if (num < 0) {
-    sign = 1;
-    num = -num;
-  }
-
-  var exp = Math.floor(Math.log(num) / Math.LN2);
-  var frac0 = num / Math.pow(2, exp) - 1;
-  var frac1 = Math.floor(frac0 * Math.pow(2, 52));
-  var b32 = Math.pow(2, 32);
-  var h32 = sign << 31 | exp + 1023 << 20 | frac1 / b32 & 0x0fffff;
-  var l32 = frac1 % b32;
-  this.bufferBuilder.append(0xcb);
-  this.pack_int32(h32);
-  this.pack_int32(l32);
-};
-
-$kdPp$var$Packer.prototype.pack_object = function (obj) {
-  var keys = Object.keys(obj);
-  var length = keys.length;
-
-  if (length <= 0x0f) {
-    this.pack_uint8(0x80 + length);
-  } else if (length <= 0xffff) {
-    this.bufferBuilder.append(0xde);
-    this.pack_uint16(length);
-  } else if (length <= 0xffffffff) {
-    this.bufferBuilder.append(0xdf);
-    this.pack_uint32(length);
-  } else {
-    throw new Error('Invalid length');
-  }
-
-  for (var prop in obj) {
-    if (obj.hasOwnProperty(prop)) {
-      this.pack(prop);
-      this.pack(obj[prop]);
-    }
-  }
-};
-
-$kdPp$var$Packer.prototype.pack_uint8 = function (num) {
-  this.bufferBuilder.append(num);
-};
-
-$kdPp$var$Packer.prototype.pack_uint16 = function (num) {
-  this.bufferBuilder.append(num >> 8);
-  this.bufferBuilder.append(num & 0xff);
-};
-
-$kdPp$var$Packer.prototype.pack_uint32 = function (num) {
-  var n = num & 0xffffffff;
-  this.bufferBuilder.append((n & 0xff000000) >>> 24);
-  this.bufferBuilder.append((n & 0x00ff0000) >>> 16);
-  this.bufferBuilder.append((n & 0x0000ff00) >>> 8);
-  this.bufferBuilder.append(n & 0x000000ff);
-};
-
-$kdPp$var$Packer.prototype.pack_uint64 = function (num) {
-  var high = num / Math.pow(2, 32);
-  var low = num % Math.pow(2, 32);
-  this.bufferBuilder.append((high & 0xff000000) >>> 24);
-  this.bufferBuilder.append((high & 0x00ff0000) >>> 16);
-  this.bufferBuilder.append((high & 0x0000ff00) >>> 8);
-  this.bufferBuilder.append(high & 0x000000ff);
-  this.bufferBuilder.append((low & 0xff000000) >>> 24);
-  this.bufferBuilder.append((low & 0x00ff0000) >>> 16);
-  this.bufferBuilder.append((low & 0x0000ff00) >>> 8);
-  this.bufferBuilder.append(low & 0x000000ff);
-};
-
-$kdPp$var$Packer.prototype.pack_int8 = function (num) {
-  this.bufferBuilder.append(num & 0xff);
-};
-
-$kdPp$var$Packer.prototype.pack_int16 = function (num) {
-  this.bufferBuilder.append((num & 0xff00) >> 8);
-  this.bufferBuilder.append(num & 0xff);
-};
-
-$kdPp$var$Packer.prototype.pack_int32 = function (num) {
-  this.bufferBuilder.append(num >>> 24 & 0xff);
-  this.bufferBuilder.append((num & 0x00ff0000) >>> 16);
-  this.bufferBuilder.append((num & 0x0000ff00) >>> 8);
-  this.bufferBuilder.append(num & 0x000000ff);
-};
-
-$kdPp$var$Packer.prototype.pack_int64 = function (num) {
-  var high = Math.floor(num / Math.pow(2, 32));
-  var low = num % Math.pow(2, 32);
-  this.bufferBuilder.append((high & 0xff000000) >>> 24);
-  this.bufferBuilder.append((high & 0x00ff0000) >>> 16);
-  this.bufferBuilder.append((high & 0x0000ff00) >>> 8);
-  this.bufferBuilder.append(high & 0x000000ff);
-  this.bufferBuilder.append((low & 0xff000000) >>> 24);
-  this.bufferBuilder.append((low & 0x00ff0000) >>> 16);
-  this.bufferBuilder.append((low & 0x0000ff00) >>> 8);
-  this.bufferBuilder.append(low & 0x000000ff);
-};
-
-function $kdPp$var$_utf8Replace(m) {
-  var code = m.charCodeAt(0);
-  if (code <= 0x7ff) return '00';
-  if (code <= 0xffff) return '000';
-  if (code <= 0x1fffff) return '0000';
-  if (code <= 0x3ffffff) return '00000';
-  return '000000';
-}
-
-function $kdPp$var$utf8Length(str) {
-  if (str.length > 600) {
-    // Blob method faster for large strings
-    return new Blob([str]).size;
-  } else {
-    return str.replace(/[^\u0000-\u007F]/g, $kdPp$var$_utf8Replace).length;
-  }
-}
-
 let $iSxC$var$logDisabled_ = true;
 let $iSxC$var$deprecationWarnings_ = true;
 /**
@@ -6114,19 +5494,19 @@ const $I31f$export$Supports = new class {
 }();
 const $BHXf$var$DEFAULT_CONFIG = {
   iceServers: [{
-    urls: "stun:stun.l.google.com:19302"
+    urls: "stun:stun1.l.google.com:19302"
   }, {
-    urls: "turn:0.peerjs.com:3478",
-    username: "peerjs",
-    credential: "peerjsp"
+    urls: "stun:stun2.l.google.com:19302"
+  }, {
+    urls: "stun:stun3.l.google.com:19302"
+  }, {
+    urls: "stun:stun4.l.google.com:19302"
   }],
   sdpSemantics: "unified-plan"
 };
 const $BHXf$export$util = new class {
   constructor() {
-    this.CLOUD_HOST = "0.peerjs.com";
-    this.CLOUD_PORT = 443; // Browsers that need chunking:
-
+    // Browsers that need chunking:
     this.chunkedBrowsers = {
       Chrome: 1,
       chrome: 1
@@ -6178,10 +5558,8 @@ const $BHXf$export$util = new class {
       }
 
       return supported;
-    }();
+    }(); // Binary stuff
 
-    this.pack = $kdPp$exports.pack;
-    this.unpack = $kdPp$exports.unpack; // Binary stuff
 
     this._dataCount = 1;
   }
@@ -6190,7 +5568,6 @@ const $BHXf$export$util = new class {
 
 
   validateId(id) {
-    // Allow empty ids
     return !id || /^[A-Za-z0-9]+(?:[ _-][A-Za-z0-9]+)*$/.test(id);
   }
 
@@ -6217,29 +5594,6 @@ const $BHXf$export$util = new class {
 
     this._dataCount++;
     return chunks;
-  }
-
-  blobToArrayBuffer(blob, cb) {
-    const fr = new FileReader();
-
-    fr.onload = function (evt) {
-      if (evt.target) {
-        cb(evt.target.result);
-      }
-    };
-
-    fr.readAsArrayBuffer(blob);
-    return fr;
-  }
-
-  binaryStringToArrayBuffer(binary) {
-    const byteArray = new Uint8Array(binary.length);
-
-    for (let i = 0; i < binary.length; i++) {
-      byteArray[i] = binary.charCodeAt(i) & 0xff;
-    }
-
-    return byteArray.buffer;
   }
 
   randomToken() {
@@ -6673,7 +6027,6 @@ var $ZRYf$export$ConnectionEventType;
 
 (function (ConnectionEventType) {
   ConnectionEventType["Open"] = "open";
-  ConnectionEventType["Stream"] = "stream";
   ConnectionEventType["Data"] = "data";
   ConnectionEventType["Close"] = "close";
   ConnectionEventType["Error"] = "error";
@@ -6684,7 +6037,6 @@ var $ZRYf$export$ConnectionType;
 
 (function (ConnectionType) {
   ConnectionType["Data"] = "data";
-  ConnectionType["Media"] = "media";
 })($ZRYf$export$ConnectionType || ($ZRYf$var$_temp2 = $ZRYf$export$ConnectionType = {}, $ZRYf$var$_temp2));
 
 var $ZRYf$export$PeerEventType;
@@ -6693,7 +6045,6 @@ var $ZRYf$export$PeerEventType;
   PeerEventType["Open"] = "open";
   PeerEventType["Close"] = "close";
   PeerEventType["Connection"] = "connection";
-  PeerEventType["Call"] = "call";
   PeerEventType["Disconnected"] = "disconnected";
   PeerEventType["Error"] = "error";
 })($ZRYf$export$PeerEventType || ($ZRYf$var$_temp3 = $ZRYf$export$PeerEventType = {}, $ZRYf$var$_temp3));
@@ -6718,8 +6069,6 @@ var $ZRYf$export$PeerErrorType;
 var $ZRYf$export$SerializationType;
 
 (function (SerializationType) {
-  SerializationType["Binary"] = "binary";
-  SerializationType["BinaryUTF8"] = "binary-utf8";
   SerializationType["JSON"] = "json";
 })($ZRYf$export$SerializationType || ($ZRYf$var$_temp5 = $ZRYf$export$SerializationType = {}, $ZRYf$var$_temp5));
 
@@ -6744,7 +6093,7 @@ var $ZRYf$export$ServerMessageType;
   ServerMessageType["IdTaken"] = "ID-TAKEN";
   ServerMessageType["InvalidKey"] = "INVALID-KEY";
   ServerMessageType["Leave"] = "LEAVE";
-  ServerMessageType["Expire"] = "EXPIRE";
+  ServerMessageType["Expire"] = "EXPIRE"; // The offer sent to a peer has expired without response.
 })($ZRYf$export$ServerMessageType || ($ZRYf$var$_temp7 = $ZRYf$export$ServerMessageType = {}, $ZRYf$var$_temp7));
 
 /**
@@ -6921,12 +6270,7 @@ class $HCdX$export$Negotiator {
     const peerConnection = this._startPeerConnection(); // Set the connection's PC.
 
 
-    this.connection.peerConnection = peerConnection;
-
-    if (this.connection.type === $ZRYf$export$ConnectionType.Media && options._stream) {
-      this._addTracksToConnection(options._stream, peerConnection);
-    } // What do we need to do now?
-
+    this.connection.peerConnection = peerConnection; // What do we need to do now?
 
     if (options.originator) {
       if (this.connection.type === $ZRYf$export$ConnectionType.Data) {
@@ -7019,16 +6363,8 @@ class $HCdX$export$Negotiator {
 
     $WOs9$export$default.log("Listening for remote stream");
 
-    peerConnection.ontrack = evt => {
+    peerConnection.ontrack = () => {
       $WOs9$export$default.log("Received remote stream");
-      const stream = evt.streams[0];
-      const connection = provider.getConnection(peerId, connectionId);
-
-      if (connection.type === $ZRYf$export$ConnectionType.Media) {
-        const mediaConnection = connection;
-
-        this._addStreamToMediaConnection(stream, mediaConnection);
-      }
     };
   }
 
@@ -7191,23 +6527,6 @@ class $HCdX$export$Negotiator {
     }
   }
 
-  _addTracksToConnection(stream, peerConnection) {
-    $WOs9$export$default.log(`add tracks from stream ${stream.id} to peer connection`);
-
-    if (!peerConnection.addTrack) {
-      return $WOs9$export$default.error(`Your browser does't support RTCPeerConnection#addTrack. Ignored.`);
-    }
-
-    stream.getTracks().forEach(track => {
-      peerConnection.addTrack(track, stream);
-    });
-  }
-
-  _addStreamToMediaConnection(stream, mediaConnection) {
-    $WOs9$export$default.log(`add stream ${stream.id} to media connection ${mediaConnection.connectionId}`);
-    mediaConnection.addStream(stream);
-  }
-
 }
 
 class $tQFK$export$BaseConnection extends $JJlS$exports.EventEmitter {
@@ -7225,129 +6544,6 @@ class $tQFK$export$BaseConnection extends $JJlS$exports.EventEmitter {
   }
 
 }
-
-/**
- * Wraps the streaming interface between two Peers.
- */
-class $dbHP$export$MediaConnection extends $tQFK$export$BaseConnection {
-  constructor(peerId, provider, options) {
-    super(peerId, provider, options);
-    this._localStream = this.options._stream;
-    this.connectionId = this.options.connectionId || $dbHP$export$MediaConnection.ID_PREFIX + $BHXf$export$util.randomToken();
-    this._negotiator = new $HCdX$export$Negotiator(this);
-
-    if (this._localStream) {
-      this._negotiator.startConnection({
-        _stream: this._localStream,
-        originator: true
-      });
-    }
-  }
-
-  get type() {
-    return $ZRYf$export$ConnectionType.Media;
-  }
-
-  get localStream() {
-    return this._localStream;
-  }
-
-  get remoteStream() {
-    return this._remoteStream;
-  }
-
-  addStream(remoteStream) {
-    $WOs9$export$default.log("Receiving stream", remoteStream);
-    this._remoteStream = remoteStream;
-    super.emit($ZRYf$export$ConnectionEventType.Stream, remoteStream); // Should we call this `open`?
-  }
-
-  handleMessage(message) {
-    const type = message.type;
-    const payload = message.payload;
-
-    switch (message.type) {
-      case $ZRYf$export$ServerMessageType.Answer:
-        // Forward to negotiator
-        this._negotiator.handleSDP(type, payload.sdp);
-
-        this._open = true;
-        break;
-
-      case $ZRYf$export$ServerMessageType.Candidate:
-        this._negotiator.handleCandidate(payload.candidate);
-
-        break;
-
-      default:
-        $WOs9$export$default.warn(`Unrecognized message type:${type} from peer:${this.peer}`);
-        break;
-    }
-  }
-
-  answer(stream, options = {}) {
-    if (this._localStream) {
-      $WOs9$export$default.warn("Local stream already exists on this MediaConnection. Are you answering a call twice?");
-      return;
-    }
-
-    this._localStream = stream;
-
-    if (options && options.sdpTransform) {
-      this.options.sdpTransform = options.sdpTransform;
-    }
-
-    this._negotiator.startConnection({ ...this.options._payload,
-      _stream: stream
-    }); // Retrieve lost messages stored because PeerConnection not set up.
-
-
-    const messages = this.provider._getMessages(this.connectionId);
-
-    for (let message of messages) {
-      this.handleMessage(message);
-    }
-
-    this._open = true;
-  }
-  /**
-   * Exposed functionality for users.
-   */
-
-  /** Allows user to close connection. */
-
-
-  close() {
-    if (this._negotiator) {
-      this._negotiator.cleanup();
-
-      this._negotiator = null;
-    }
-
-    this._localStream = null;
-    this._remoteStream = null;
-
-    if (this.provider) {
-      this.provider._removeConnection(this);
-
-      this.provider = null;
-    }
-
-    if (this.options && this.options._stream) {
-      this.options._stream = null;
-    }
-
-    if (!this.open) {
-      return;
-    }
-
-    this._open = false;
-    super.emit($ZRYf$export$ConnectionEventType.Close);
-  }
-
-}
-
-$dbHP$export$MediaConnection.ID_PREFIX = "mc_";
 
 class $GGp6$export$EncodingQueue extends $JJlS$exports.EventEmitter {
   constructor() {
@@ -7421,7 +6617,7 @@ class $GBTQ$export$DataConnection extends $tQFK$export$BaseConnection {
     this._encodingQueue = new $GGp6$export$EncodingQueue();
     this.connectionId = this.options.connectionId || $GBTQ$export$DataConnection.ID_PREFIX + $BHXf$export$util.randomToken();
     this.label = this.options.label || this.connectionId;
-    this.serialization = this.options.serialization || $ZRYf$export$SerializationType.Binary;
+    this.serialization = this.options.serialization || $ZRYf$export$SerializationType.JSON;
     this.reliable = !!this.options.reliable;
 
     this._encodingQueue.on('done', ab => {
@@ -7487,26 +6683,9 @@ class $GBTQ$export$DataConnection extends $tQFK$export$BaseConnection {
   _handleDataMessage({
     data
   }) {
-    const datatype = data.constructor;
-    const isBinarySerialization = this.serialization === $ZRYf$export$SerializationType.Binary || this.serialization === $ZRYf$export$SerializationType.BinaryUTF8;
     let deserializedData = data;
 
-    if (isBinarySerialization) {
-      if (datatype === Blob) {
-        // Datatype should never be blob
-        $BHXf$export$util.blobToArrayBuffer(data, ab => {
-          const unpackedData = $BHXf$export$util.unpack(ab);
-          this.emit($ZRYf$export$ConnectionEventType.Data, unpackedData);
-        });
-        return;
-      } else if (datatype === ArrayBuffer) {
-        deserializedData = $BHXf$export$util.unpack(data);
-      } else if (datatype === String) {
-        // String fallback for binary data for browsers that don't support binary yet
-        const ab = $BHXf$export$util.binaryStringToArrayBuffer(data);
-        deserializedData = $BHXf$export$util.unpack(ab);
-      }
-    } else if (this.serialization === $ZRYf$export$SerializationType.JSON) {
+    if (this.serialization === $ZRYf$export$SerializationType.JSON) {
       deserializedData = this.parse(data);
     } // Check if we've chunked--if so, piece things back together.
     // We're guaranteed that this isn't 0.
@@ -7534,7 +6713,8 @@ class $GBTQ$export$DataConnection extends $tQFK$export$BaseConnection {
 
     if (chunkInfo.total === chunkInfo.count) {
       // Clean up before making the recursive call to `_handleDataMessage`.
-      delete this._chunkedData[id];
+      delete this._chunkedData[id]; // We've received all the chunks--time to construct the complete data.
+
       const data = new Blob(chunkInfo.data);
 
       this._handleDataMessage({
@@ -7591,7 +6771,7 @@ class $GBTQ$export$DataConnection extends $tQFK$export$BaseConnection {
   /** Allows user to send data. */
 
 
-  send(data, chunked) {
+  send(data) {
     if (!this.open) {
       super.emit($ZRYf$export$ConnectionEventType.Error, new Error("Connection is not open. You should listen for the `open` event before sending messages."));
       return;
@@ -7599,22 +6779,6 @@ class $GBTQ$export$DataConnection extends $tQFK$export$BaseConnection {
 
     if (this.serialization === $ZRYf$export$SerializationType.JSON) {
       this._bufferedSend(this.stringify(data));
-    } else if (this.serialization === $ZRYf$export$SerializationType.Binary || this.serialization === $ZRYf$export$SerializationType.BinaryUTF8) {
-      const blob = $BHXf$export$util.pack(data);
-
-      if (!chunked && blob.size > $BHXf$export$util.chunkedMTU) {
-        this._sendChunks(blob);
-
-        return;
-      }
-
-      if (!$BHXf$export$util.supports.binaryBlob) {
-        // We only do this if we really need to (e.g. blobs are not supported),
-        // because this conversion is costly.
-        this._encodingQueue.enque(blob);
-      } else {
-        this._bufferedSend(blob);
-      }
     } else {
       this._bufferedSend(data);
     }
@@ -7677,15 +6841,6 @@ class $GBTQ$export$DataConnection extends $tQFK$export$BaseConnection {
     }
   }
 
-  _sendChunks(blob) {
-    const blobs = $BHXf$export$util.chunk(blob);
-    $WOs9$export$default.log(`DC#${this.connectionId} Try to send ${blobs.length} chunks...`);
-
-    for (let blob of blobs) {
-      this.send(blob, true);
-    }
-  }
-
   handleMessage(message) {
     const payload = message.payload;
 
@@ -7741,7 +6896,7 @@ class $in7L$export$API {
       $WOs9$export$default.error("Error retrieving ID", error);
       let pathError = "";
 
-      if (this._options.path === "/" && this._options.host !== $BHXf$export$util.CLOUD_HOST) {
+      if (this._options.path === "/") {
         pathError = " If you passed in a `path` to your self-hosted PeerServer, " + "you'll also need to pass in that same path when creating a new " + "Peer.";
       }
 
@@ -7760,13 +6915,7 @@ class $in7L$export$API {
       if (response.status !== 200) {
         if (response.status === 401) {
           let helpfulError = "";
-
-          if (this._options.host === $BHXf$export$util.CLOUD_HOST) {
-            helpfulError = "It looks like you're using the cloud server. You can email " + "team@peerjs.com to enable peer listing for your API key.";
-          } else {
-            helpfulError = "You need to enable `allow_discovery` on your self-hosted " + "PeerServer to use this feature.";
-          }
-
+          helpfulError = "You need to enable `allow_discovery` on your self-hosted " + "PeerServer to use this feature.";
           throw new Error("It doesn't look like you have permission to list peers IDs. " + helpfulError);
         }
 
@@ -7812,8 +6961,8 @@ class $Hxpd$export$Peer extends $JJlS$exports.EventEmitter {
 
     options = {
       debug: 0,
-      host: $BHXf$export$util.CLOUD_HOST,
-      port: $BHXf$export$util.CLOUD_PORT,
+      host: 'localhost',
+      port: 4242,
       path: "/",
       key: $Hxpd$export$Peer.DEFAULT_KEY,
       token: $BHXf$export$util.randomToken(),
@@ -7838,10 +6987,8 @@ class $Hxpd$export$Peer extends $JJlS$exports.EventEmitter {
     } // Set whether we use SSL to same as current host
 
 
-    if (this._options.secure === undefined && this._options.host !== $BHXf$export$util.CLOUD_HOST) {
+    if (this._options.secure === undefined) {
       this._options.secure = $BHXf$export$util.isSecure();
-    } else if (this._options.host == $BHXf$export$util.CLOUD_HOST) {
-      this._options.secure = true;
     } // Set a custom log function if present
 
 
@@ -7945,8 +7092,6 @@ class $Hxpd$export$Peer extends $JJlS$exports.EventEmitter {
     this._id = id;
     this.socket.start(id, this._options.token);
   }
-  /** Handles messages from the server. */
-
 
   _handleMessage(message) {
     const type = message.type;
@@ -7996,6 +7141,7 @@ class $Hxpd$export$Peer extends $JJlS$exports.EventEmitter {
 
       case $ZRYf$export$ServerMessageType.Offer:
         {
+          // we should consider switching this to CALL/CONNECT, but this is the least breaking option.
           const connectionId = payload.connectionId;
           let connection = this.getConnection(peerId, connectionId);
 
@@ -8005,17 +7151,7 @@ class $Hxpd$export$Peer extends $JJlS$exports.EventEmitter {
           } // Create a new connection.
 
 
-          if (payload.type === $ZRYf$export$ConnectionType.Media) {
-            connection = new $dbHP$export$MediaConnection(peerId, this, {
-              connectionId: connectionId,
-              _payload: payload,
-              metadata: payload.metadata
-            });
-
-            this._addConnection(peerId, connection);
-
-            this.emit($ZRYf$export$PeerEventType.Call, connection);
-          } else if (payload.type === $ZRYf$export$ConnectionType.Data) {
+          if (payload.type === $ZRYf$export$ConnectionType.Data) {
             connection = new $GBTQ$export$DataConnection(peerId, this, {
               connectionId: connectionId,
               _payload: payload,
@@ -8076,9 +7212,7 @@ class $Hxpd$export$Peer extends $JJlS$exports.EventEmitter {
     }
 
     this._lostMessages.get(connectionId).push(message);
-  }
-  /** Retrieve messages from lost message store */
-  //TODO Change it to private
+  } //TODO Change it to private
 
 
   _getMessages(connectionId) {
@@ -8110,31 +7244,6 @@ class $Hxpd$export$Peer extends $JJlS$exports.EventEmitter {
     this._addConnection(peer, dataConnection);
 
     return dataConnection;
-  }
-  /**
-   * Returns a MediaConnection to the specified peer. See documentation for a
-   * complete list of options.
-   */
-
-
-  call(peer, stream, options = {}) {
-    if (this.disconnected) {
-      $WOs9$export$default.warn("You cannot connect to a new Peer because you called " + ".disconnect() on this Peer and ended your connection with the " + "server. You can create a new Peer to reconnect.");
-      this.emitError($ZRYf$export$PeerErrorType.Disconnected, "Cannot connect to new Peer after disconnecting from server.");
-      return;
-    }
-
-    if (!stream) {
-      $WOs9$export$default.error("To call a peer, you must provide a stream from your browser's `getUserMedia`.");
-      return;
-    }
-
-    options._stream = stream;
-    const mediaConnection = new $dbHP$export$MediaConnection(peer, this, options);
-
-    this._addConnection(peer, mediaConnection);
-
-    return mediaConnection;
   }
   /** Add a data/media connection to this peer. */
 
@@ -8321,16 +7430,9 @@ class $Hxpd$export$Peer extends $JJlS$exports.EventEmitter {
 }
 
 $Hxpd$export$Peer.DEFAULT_KEY = "peerjs";
-const $iTK6$export$peerjs = {
-  Peer: $Hxpd$export$Peer,
-  util: $BHXf$export$util
-};
-$iTK6$exports.peerjs = $iTK6$export$peerjs;
+$iTK6$exports.util = $BHXf$export$util;
 $iTK6$exports.default = $Hxpd$export$Peer;
-window.peerjs = $iTK6$export$peerjs;
-/** @deprecated Should use peerjs namespace */
-
-window.Peer = $Hxpd$export$Peer;
+$iTK6$exports.Peer = $Hxpd$export$Peer;
 
 if (typeof exports === "object" && typeof module !== "undefined") {
   // CommonJS

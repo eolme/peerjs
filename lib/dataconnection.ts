@@ -58,7 +58,7 @@ export class DataConnection extends BaseConnection implements IDataConnection {
       this.options.connectionId || DataConnection.ID_PREFIX + util.randomToken();
 
     this.label = this.options.label || this.connectionId;
-    this.serialization = this.options.serialization || SerializationType.Binary;
+    this.serialization = this.options.serialization || SerializationType.JSON;
     this.reliable = !!this.options.reliable;
 
     this._encodingQueue.on('done', (ab: ArrayBuffer) => {
@@ -109,29 +109,9 @@ export class DataConnection extends BaseConnection implements IDataConnection {
 
   // Handles a DataChannel message.
   private _handleDataMessage({ data }: { data: Blob | ArrayBuffer | string }): void {
-    const datatype = data.constructor;
-
-    const isBinarySerialization = this.serialization === SerializationType.Binary ||
-      this.serialization === SerializationType.BinaryUTF8;
-
     let deserializedData: any = data;
 
-    if (isBinarySerialization) {
-      if (datatype === Blob) {
-        // Datatype should never be blob
-        util.blobToArrayBuffer(data as Blob, (ab) => {
-          const unpackedData = util.unpack(ab);
-          this.emit(ConnectionEventType.Data, unpackedData);
-        });
-        return;
-      } else if (datatype === ArrayBuffer) {
-        deserializedData = util.unpack(data as ArrayBuffer);
-      } else if (datatype === String) {
-        // String fallback for binary data for browsers that don't support binary yet
-        const ab = util.binaryStringToArrayBuffer(data as string);
-        deserializedData = util.unpack(ab);
-      }
-    } else if (this.serialization === SerializationType.JSON) {
+    if (this.serialization === SerializationType.JSON) {
       deserializedData = this.parse(data as string);
     }
 
@@ -211,7 +191,7 @@ export class DataConnection extends BaseConnection implements IDataConnection {
   }
 
   /** Allows user to send data. */
-  send(data: any, chunked?: boolean): void {
+  send(data: any): void {
     if (!this.open) {
       super.emit(
         ConnectionEventType.Error,
@@ -224,24 +204,6 @@ export class DataConnection extends BaseConnection implements IDataConnection {
 
     if (this.serialization === SerializationType.JSON) {
       this._bufferedSend(this.stringify(data));
-    } else if (
-      this.serialization === SerializationType.Binary ||
-      this.serialization === SerializationType.BinaryUTF8
-    ) {
-      const blob = util.pack(data);
-
-      if (!chunked && blob.size > util.chunkedMTU) {
-        this._sendChunks(blob);
-        return;
-      }
-
-      if (!util.supports.binaryBlob) {
-        // We only do this if we really need to (e.g. blobs are not supported),
-        // because this conversion is costly.
-        this._encodingQueue.enque(blob);
-      } else {
-        this._bufferedSend(blob);
-      }
     } else {
       this._bufferedSend(data);
     }
@@ -300,15 +262,6 @@ export class DataConnection extends BaseConnection implements IDataConnection {
       this._buffer.shift();
       this._bufferSize = this._buffer.length;
       this._tryBuffer();
-    }
-  }
-
-  private _sendChunks(blob: Blob): void {
-    const blobs = util.chunk(blob);
-    logger.log(`DC#${this.connectionId} Try to send ${blobs.length} chunks...`);
-
-    for (let blob of blobs) {
-      this.send(blob, true);
     }
   }
 

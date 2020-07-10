@@ -1,6 +1,5 @@
 import { util } from "./util";
 import logger from "./logger";
-import { MediaConnection } from "./mediaconnection";
 import { DataConnection } from "./dataconnection";
 import { ConnectionType, PeerErrorType, ConnectionEventType, ServerMessageType } from "./enums";
 import { BaseConnection } from "./baseconnection";
@@ -17,10 +16,6 @@ export class Negotiator {
 
     // Set the connection's PC.
     this.connection.peerConnection = peerConnection;
-
-    if (this.connection.type === ConnectionType.Media && options._stream) {
-      this._addTracksToConnection(options._stream, peerConnection);
-    }
 
     // What do we need to do now?
     if (options.originator) {
@@ -137,17 +132,8 @@ export class Negotiator {
     // MEDIACONNECTION.
     logger.log("Listening for remote stream");
 
-    peerConnection.ontrack = (evt) => {
+    peerConnection.ontrack = () => {
       logger.log("Received remote stream");
-
-      const stream = evt.streams[0];
-      const connection = provider.getConnection(peerId, connectionId);
-
-      if (connection.type === ConnectionType.Media) {
-        const mediaConnection = <MediaConnection>connection;
-
-        this._addStreamToMediaConnection(stream, mediaConnection);
-      }
     };
   }
 
@@ -327,35 +313,5 @@ export class Negotiator {
       provider.emitError(PeerErrorType.WebRTC, err);
       logger.log("Failed to handleCandidate, ", err);
     }
-  }
-
-  private _addTracksToConnection(
-    stream: MediaStream,
-    peerConnection: RTCPeerConnection
-  ): void {
-    logger.log(`add tracks from stream ${stream.id} to peer connection`);
-
-    if (!peerConnection.addTrack) {
-      return logger.error(
-        `Your browser does't support RTCPeerConnection#addTrack. Ignored.`
-      );
-    }
-
-    stream.getTracks().forEach(track => {
-      peerConnection.addTrack(track, stream);
-    });
-  }
-
-  private _addStreamToMediaConnection(
-    stream: MediaStream,
-    mediaConnection: MediaConnection
-  ): void {
-    logger.log(
-      `add stream ${stream.id} to media connection ${
-      mediaConnection.connectionId
-      }`
-    );
-
-    mediaConnection.addStream(stream);
   }
 }

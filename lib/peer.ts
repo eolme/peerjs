@@ -2,7 +2,6 @@ import { EventEmitter } from "eventemitter3";
 import { util } from "./util";
 import logger, { LogLevel } from "./logger";
 import { Socket } from "./socket";
-import { MediaConnection } from "./mediaconnection";
 import { DataConnection } from "./dataconnection";
 import {
   ConnectionType,
@@ -101,8 +100,8 @@ export class Peer extends EventEmitter {
     // Configurize options
     options = {
       debug: 0, // 1: Errors, 2: Warnings, 3: All logs
-      host: util.CLOUD_HOST,
-      port: util.CLOUD_PORT,
+      host: 'localhost',
+      port: 4242,
       path: "/",
       key: Peer.DEFAULT_KEY,
       token: util.randomToken(),
@@ -127,10 +126,8 @@ export class Peer extends EventEmitter {
     }
 
     // Set whether we use SSL to same as current host
-    if (this._options.secure === undefined && this._options.host !== util.CLOUD_HOST) {
+    if (this._options.secure === undefined) {
       this._options.secure = util.isSecure();
-    } else if (this._options.host == util.CLOUD_HOST) {
-      this._options.secure = true;
     }
     // Set a custom log function if present
     if (this._options.logFunction) {
@@ -251,15 +248,7 @@ export class Peer extends EventEmitter {
         }
 
         // Create a new connection.
-        if (payload.type === ConnectionType.Media) {
-          connection = new MediaConnection(peerId, this, {
-            connectionId: connectionId,
-            _payload: payload,
-            metadata: payload.metadata
-          });
-          this._addConnection(peerId, connection);
-          this.emit(PeerEventType.Call, connection);
-        } else if (payload.type === ConnectionType.Data) {
+        if (payload.type === ConnectionType.Data) {
           connection = new DataConnection(peerId, this, {
             connectionId: connectionId,
             _payload: payload,
@@ -350,38 +339,6 @@ export class Peer extends EventEmitter {
     const dataConnection = new DataConnection(peer, this, options);
     this._addConnection(peer, dataConnection);
     return dataConnection;
-  }
-
-  /**
-   * Returns a MediaConnection to the specified peer. See documentation for a
-   * complete list of options.
-   */
-  call(peer: string, stream: MediaStream, options: any = {}): MediaConnection {
-    if (this.disconnected) {
-      logger.warn(
-        "You cannot connect to a new Peer because you called " +
-        ".disconnect() on this Peer and ended your connection with the " +
-        "server. You can create a new Peer to reconnect."
-      );
-      this.emitError(
-        PeerErrorType.Disconnected,
-        "Cannot connect to new Peer after disconnecting from server."
-      );
-      return;
-    }
-
-    if (!stream) {
-      logger.error(
-        "To call a peer, you must provide a stream from your browser's `getUserMedia`."
-      );
-      return;
-    }
-
-    options._stream = stream;
-
-    const mediaConnection = new MediaConnection(peer, this, options);
-    this._addConnection(peer, mediaConnection);
-    return mediaConnection;
   }
 
   /** Add a data/media connection to this peer. */

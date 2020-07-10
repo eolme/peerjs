@@ -1,20 +1,18 @@
-import * as BinaryPack from "peerjs-js-binarypack";
 import { Supports } from './supports';
 import { UtilSupportsObj } from '..';
 
 const DEFAULT_CONFIG = {
   iceServers: [
-    { urls: "stun:stun.l.google.com:19302" },
-    { urls: "turn:0.peerjs.com:3478", username: "peerjs", credential: "peerjsp" }
+    { urls: "stun:stun1.l.google.com:19302" },
+    { urls: "stun:stun2.l.google.com:19302" },
+    { urls: "stun:stun3.l.google.com:19302" },
+    { urls: "stun:stun4.l.google.com:19302" }
   ],
   sdpSemantics: "unified-plan"
 };
 
 export const util = new class {
   noop(): void { }
-
-  readonly CLOUD_HOST = "0.peerjs.com";
-  readonly CLOUD_PORT = 443;
 
   // Browsers that need chunking:
   readonly chunkedBrowsers = { Chrome: 1, chrome: 1 };
@@ -81,9 +79,6 @@ export const util = new class {
     return !id || /^[A-Za-z0-9]+(?:[ _-][A-Za-z0-9]+)*$/.test(id);
   }
 
-  pack = BinaryPack.pack;
-  unpack = BinaryPack.unpack;
-
   // Binary stuff
 
   private _dataCount: number = 1;
@@ -116,30 +111,6 @@ export const util = new class {
     this._dataCount++;
 
     return chunks;
-  }
-
-  blobToArrayBuffer(blob: Blob, cb: (arg: ArrayBuffer | null) => void): FileReader {
-    const fr = new FileReader();
-
-    fr.onload = function (evt) {
-      if (evt.target) {
-        cb(evt.target.result as ArrayBuffer);
-      }
-    };
-
-    fr.readAsArrayBuffer(blob);
-
-    return fr;
-  }
-
-  binaryStringToArrayBuffer(binary: string): ArrayBuffer | SharedArrayBuffer {
-    const byteArray = new Uint8Array(binary.length);
-
-    for (let i = 0; i < binary.length; i++) {
-      byteArray[i] = binary.charCodeAt(i) & 0xff;
-    }
-
-    return byteArray.buffer;
   }
 
   randomToken(): string {
