@@ -5,7 +5,7 @@ PeerJS provides a complete, configurable, and easy-to-use peer-to-peer API built
 
 ## Warning
 
-This fork only supports data connections.
+This fork only supports data connections and json serialization.
 
 
 ## Setup
