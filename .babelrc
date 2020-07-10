@@ -1,0 +1,21 @@
+{
+  "presets": [
+    [
+      "env",
+      {
+        "bugfixes": true,
+        "spec": false,
+        "loose": true,
+        "modules": false,
+        "useBuiltIns": false,
+        "forceAllTransforms": false,
+        "ignoreBrowserslistConfig": true,
+        "targets": {
+          "browsers": [
+            "last 1 Chrome version"
+          ]
+        }
+      }
+    ]
+  ]
+}

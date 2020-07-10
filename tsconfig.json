@@ -1,7 +1,12 @@
 {
   "compilerOptions": {
-    "target": "es5",
-    "module": "commonjs",
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "esModuleInterop": true,
+    "allowUmdGlobalAccess": false,
+    "useDefineForClassFields": false,
+    "experimentalDecorators": true,
     "downlevelIteration": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,

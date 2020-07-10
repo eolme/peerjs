@@ -1,4 +1,4 @@
-# PeerJS: Simple peer-to-peer with WebRTC #
+# PeerJS: Simple peer-to-peer with WebRTC <sup>ESNext</sup> #
 
 ### https://t.me/joinchat/ENhPuhTvhm8WlIxTjQf7Og
 
@@ -16,7 +16,7 @@ PeerJS provides a complete, configurable, and easy-to-use peer-to-peer API built
         `npm install peerjs`
     and the usage:
   ```js
-  import Peer from 'peerjs';
+  import Peer from 'peerjs-esnext';
   ```
 
 
@@ -79,16 +79,6 @@ peer.on('call', (call) => {
 ```bash
 npm test
 ```
-
-## Browsers support
-
-| [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/firefox/firefox_48x48.png" alt="Firefox" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)</br>Firefox | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/chrome/chrome_48x48.png" alt="Chrome" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)</br>Chrome | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/safari/safari_48x48.png" alt="Safari" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)</br>Safari |
-| --------- | --------- | --------- |
-| last 4 versions| last 4 versions| 12.1+
-
-## Safari
-
-1. Safari supports only string data when sending via DataConnection. Use JSON serialization type if you want to communicate with Safari. By default, DataConnection uses Binary serialization type.
 
 ## FAQ
 
