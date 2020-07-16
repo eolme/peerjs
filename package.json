@@ -1,12 +1,10 @@
 {
   "name": "peerjs-esnext",
-  "version": "1.4.1",
+  "version": "2.0.0",
   "description": "PeerJS client",
-  "main": "./dist/peerjs.js",
-  "module": "./dist/peerjs.js",
-  "esnext": "./dist/peerjs.js",
-  "browser": "./dist/peerjs.min.js",
-  "umd": "./dist/peerjs.min.js",
+  "main": "./dist/peerjs-esnext.common.js",
+  "module": "./dist/peerjs-esnext.js",
+  "esnext": "./dist/peerjs-esnext.js",
   "homepage": "https://github.com/eolme/peerjs#readme",
   "keywords": [
     "peerjs",
@@ -22,9 +20,8 @@
     "url": "https://github.com/eolme/peerjs/issues"
   },
   "files": [
-    "dist/*.js",
-    "lib/",
-    "index.d.ts"
+    "dist/",
+    "lib/"
   ],
   "author": "Michelle Bu, Eric Zhang, Jairo Caro-Accino, Carlos Caballero",
   "maintainers": [
@@ -33,35 +30,24 @@
   ],
   "license": "MIT",
   "scripts": {
-    "build": "parcel build lib/exports.ts --out-file peerjs.min.js --experimental-scope-hoisting",
-    "build-nonminified": "parcel build lib/exports.ts --out-file peerjs.js --no-minify --experimental-scope-hoisting",
-    "prepublishOnly": "npm run build",
-    "test": "mocha -r ts-node/register -r jsdom-global/register test/**/*.ts"
+    "build": "parcel build lib/exports.ts --no-minify --no-source-maps",
+    "prepublishOnly": "npm run build"
   },
   "release": {
     "branch": "master"
   },
-  "types": "./index.d.ts",
   "devDependencies": {
-    "@types/chai": "^4.2.11",
-    "@types/mocha": "^7.0.2",
-    "babel-core": "^6.26.3",
-    "babel-preset-env": "^1.7.0",
-    "chai": "^4.2.0",
-    "jsdom": "^16.3.0",
-    "jsdom-global": "^3.0.2",
-    "mocha": "^7.2.0",
-    "mock-socket": "8.0.5",
-    "parcel-bundler": "^1.12.4",
-    "standard": "^14.3.4",
-    "ts-node": "^8.10.2",
+    "@babel/core": "^7.10.5",
+    "@babel/preset-env": "^7.10.4",
+    "@parcel/config-default": "2.0.0-beta.1",
+    "@parcel/transformer-typescript-tsc": "2.0.0-beta.1",
+    "parcel": "2.0.0-beta.1",
     "typescript": "^3.9.6"
   },
   "dependencies": {
-    "@types/node": "^14.0.20",
+    "@types/node": "^14.0.23",
     "@types/webrtc": "^0.0.26",
     "eventemitter3": "^4.0.4",
-    "peerjs-js-binarypack": "1.0.1",
     "webrtc-adapter": "^7.6.3"
   },
   "collective": {

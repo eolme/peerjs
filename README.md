@@ -17,7 +17,7 @@ This fork only supports data connections and json serialization.
         `npm install peerjs`
     and the usage:
   ```js
-  import { Peer } from 'peerjs-esnext';
+  import Peer from 'peerjs-esnext';
   ```
 
 
